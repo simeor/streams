@@ -1,5 +1,6 @@
 import {SIGN_IN,SIGN_OUT,CREATE_STREAM,FETCH_STREMS,FETCH_STREM,DELETE_STREAM,EDIT_STREAM} from "./types";
 import streams from '../apis/streams';
+import history from '../history';
 
 export const signIn = (userId) => {
   return {
@@ -19,6 +20,8 @@ export const createStream = (formValues) => async (dispatch, getState) => {
   const {userId} = getState().auth;
   const res = await streams.post('/streams', {...formValues, userId});
   dispatch({type: CREATE_STREAM, payload: res.data})
+  // nav user to list of streams once created a new one via own custom history router
+  history.push('/');
  };
 
 // get all streams (GET)
