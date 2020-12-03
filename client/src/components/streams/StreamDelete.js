@@ -1,26 +1,51 @@
 import React, {Fragment} from "react";
 import Modal from '../Modal';
+import history from '../../history';
+import {connect} from 'react-redux';
+import {fetchStream, deleteStream} from '../../actions';
+import {Link} from 'react-router-dom';
 
 
-const StreamDelete = () => {
+class StreamDelete extends React.Component {
 
-  const actions = (
-    <Fragment>
-       <button className="ui button red">Delete</button>
-        <button className="ui button">Cancel</button>
-    </Fragment>
-   );
+  componentDidMount(){
+    fetchStream(this.props.match.params.id)
+  }
 
-  return(
-    <div>
-      StreamDelete comp
-      <Modal
-      title="Delete Stream"
-      content = "Are you sure you want to delete this streat"
-      actions={actions}
-      />
-    </div>
-  );
-};
 
-export default StreamDelete;
+  renderActions() {
+    const {id} = this.props.match.params;
+    return (
+      <Fragment>
+         <button onClick={() => this.props.deleteStream(id)} className="ui button red">Delete</button>
+          <Link to="/" className="ui button">Cancel</Link>
+      </Fragment>
+     );
+  }
+
+  renderContent(){
+    if (!this.props.stream){
+      return 'Are you sure you want to delete this stream';
+    } else {
+        return `Are you sure you want to delete: ${this.props.stream.title}`;
+    }
+  }
+
+   render(){
+      return(
+          <Modal
+          title="Delete Stream"
+          content ={this.renderContent()}
+          actions={this.renderActions()}
+          onDismiss={() => history.push('/')}
+          />
+      );
+    };
+ }
+
+ const mapStateToProps = (state, ownProps) => {
+   return {stream: state.streams[ownProps.match.params.id]}
+ };
+
+
+export default connect(mapStateToProps, {fetchStream, deleteStream}) (StreamDelete);
